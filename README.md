@@ -1,6 +1,6 @@
 # gitApi
 # EXTRACTING PROFILE INFORMATION WITH GITHUB API
--I rebuilt a project that was previously done with js using PHP's Curl structure. I used Github's own apis in the project. Thanks to the project, we can view the profile information and repos of the user whose GitHub username is entered.
+- I rebuilt a project that was previously done with js using PHP's Curl structure. I used Github's own apis in the project. Thanks to the project, we can view the profile information and repos of the user whose GitHub username is entered.
 - You can use the project for all purposes..<br> <br> <br>
 ![gitApi](gitApi.PNG) <br> <br>
 
