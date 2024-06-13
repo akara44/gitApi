@@ -86,7 +86,9 @@
                         <small><?= $data->company ?: "N/A" ?></small> <br>
                         <small><?= $data->location ?: "N/A" ?></small>
                     </div>
-
+                    <p>
+                    <?= $data->bio ?>
+                    </p>
                     <ul>
                         <li>
                             <i class="fa-solid fa-user-group"></i> <?= $data->followers ?>
