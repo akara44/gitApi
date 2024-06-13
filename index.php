@@ -13,7 +13,7 @@
             text-align: center;
             color: white;
             cursor: pointer;
-            font-size: 1.5em; /* Yazı boyutunu büyüttük */
+            font-size: 1.5em;
         }
     </style>
 </head>
@@ -32,50 +32,49 @@
         $api_url = "https://api.github.com/users/$user";
         $api_urlr = "https://api.github.com/users/$user/repos";
 
-        // cURL oturumu başlatın
-        $ch = curl_init();
+        // cURL oturumunu başlatın
+        $mh = curl_multi_init();
+
+        // cURL handler oluşturun
+        $ch1 = curl_init();
+        $ch2 = curl_init();
 
         // cURL seçeneklerini ayarlayın
-        curl_setopt($ch, CURLOPT_URL, $api_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP');
+        curl_setopt($ch1, CURLOPT_URL, $api_url);
+        curl_setopt($ch1, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch1, CURLOPT_USERAGENT, 'PHP');
 
-        // API'den gelen veriyi alın
-        $response = curl_exec($ch);
+        curl_setopt($ch2, CURLOPT_URL, $api_urlr);
+        curl_setopt($ch2, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch2, CURLOPT_USERAGENT, 'PHP');
 
-        // HTTP durum kodunu kontrol edin
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        // cURL handler'larını multi handle'a ekleyin
+        curl_multi_add_handle($mh, $ch1);
+        curl_multi_add_handle($mh, $ch2);
 
-        // cURL oturumunu kapatın
-        curl_close($ch);
+        // cURL işlemlerini çalıştırın
+        do {
+            $status = curl_multi_exec($mh, $active);
+            curl_multi_select($mh);
+        } while ($active && $status == CURLM_OK);
 
-        if ($http_code == 200) {
+        // Sonuçları alın
+        $response = curl_multi_getcontent($ch1);
+        $response_repos = curl_multi_getcontent($ch2);
+
+        // HTTP durum kodlarını kontrol edin
+        $http_code = curl_getinfo($ch1, CURLINFO_HTTP_CODE);
+        $http_code_repos = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
+
+        // cURL handler'larını kapatın
+        curl_multi_remove_handle($mh, $ch1);
+        curl_multi_remove_handle($mh, $ch2);
+        curl_multi_close($mh);
+
+        if ($http_code == 200 && $http_code_repos == 200) {
             // JSON verisini PHP nesnesine dönüştürün
             $data = json_decode($response);
-
-            // İkinci cURL oturumu başlatın
-            $ch_repos = curl_init();
-
-            // cURL seçeneklerini ayarlayın
-            curl_setopt($ch_repos, CURLOPT_URL, $api_urlr);
-            curl_setopt($ch_repos, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch_repos, CURLOPT_USERAGENT, 'PHP');
-
-            // API'den gelen veriyi alın
-            $response_repos = curl_exec($ch_repos);
-
-            // HTTP durum kodunu kontrol edin
-            $http_code_repos = curl_getinfo($ch_repos, CURLINFO_HTTP_CODE);
-
-            // cURL oturumunu kapatın
-            curl_close($ch_repos);
-
-            if ($http_code_repos == 200) {
-                // JSON verisini PHP nesnesine dönüştürün
-                $repos = json_decode($response_repos);
-            } else {
-                $repos = [];
-            }
+            $repos = json_decode($response_repos);
 
             if ($data):
     ?>
