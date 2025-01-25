@@ -71,3 +71,4 @@ With the php codes given below, I showed how to print the data we read from the 
 
 - You can do the same for other data.
 - I hope it was an easy and understandable explanation. I hope it will meet your needs.
+- For the project to work fully, remove the index.php file from the public folder.
